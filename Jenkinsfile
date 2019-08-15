@@ -62,6 +62,7 @@ pipeline {
       steps {
         container('maven') {
           dir('charts/spring-demo') {
+            sh "helm init --skip-refresh --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts --client-only"
             sh "jx step changelog --version v\$(cat ../../VERSION)"
 
             // release the helm chart
