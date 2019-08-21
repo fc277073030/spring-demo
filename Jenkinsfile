@@ -20,7 +20,6 @@ pipeline {
       }
       steps {
         container('maven') {
-          //sh "sleep 1h"
           sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
           sh "mvn install"
           // sh "skaffold version"
@@ -39,7 +38,6 @@ pipeline {
       }
       steps {
         container('maven') {
-          // sh "sleep 1h"
           // ensure we're not on a detached head
           sh "git checkout master"
           sh "git config --global credential.helper store"
