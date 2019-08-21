@@ -61,6 +61,7 @@ pipeline {
       steps {
         container('maven') {
           dir('charts/spring-demo') {
+          
             // add repo aliyun stable
             sh "helm init --skip-refresh --stable-repo-url https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts --client-only"
             
