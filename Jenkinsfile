@@ -20,6 +20,7 @@ pipeline {
       }
       steps {
         container('maven') {
+          sh "sleep 1h"
           sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
           sh "mvn install"
           // sh "skaffold version"
