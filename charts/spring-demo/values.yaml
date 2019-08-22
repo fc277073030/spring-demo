@@ -7,6 +7,8 @@ image:
   tag: dev
   pullPolicy: IfNotPresent
 
+imagePullSecrets: aliyun-docker-registry
+
 # define environment variables here as a map of key: value
 env:
 
