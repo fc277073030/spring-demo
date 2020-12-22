@@ -1,0 +1,64 @@
+#cache: &global_cache
+#  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+#  paths:
+#    - node_modules/
+
+stages:
+#  - yarn install
+#  - docker-build-push
+  - deploy
+
+#build:
+#   image: node:latest
+#   stage: build
+#
+#   before_script:
+#     - echo "start build"
+#   script:
+#     - yarn install --production --frozen-lockfile
+#   tags:
+#     - myk8s
+
+#docker-build-push:
+#  stage: docker-build-push
+#
+#  cache:
+#    <<: *global_cache
+#    policy: pull
+#
+#  services:
+#    - docker:18.09-dind
+#  image: docker:18.09
+#  variables:
+#    DOCKER_DRIVER: overlay2
+#    DOCKER_HOST: tcp://docker:2375/
+#    # DOCKER_TLS_CERTDIR: ""
+#
+#    CI_REGISTRY_USER: admin
+#    CI_REGISTRY_PASSWORD: Harbor12345
+#    CI_REGISTRY: local-registry.arnoo.com
+#    CI_REGISTRY_IMAGE: local-registry.arnoo.com/devops/example-test
+#
+#
+#  before_script:
+#    - env
+#    - docker ps
+#    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#  script:
+#    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
+#    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+#  tags:
+#    - myk8s
+
+
+deploy:
+#  variables:
+#    KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-ci
+#    KUBERNETES_NAMESPACE_OVERWRITE: ci-${CI_COMMIT_REF_SLUG}
+  image: lachlanevenson/k8s-kubectl:v1.18.14
+  stage: deploy
+  script:
+    - kubectl version
+    - kubectl get pod
+  tags:
+    - myk8s
