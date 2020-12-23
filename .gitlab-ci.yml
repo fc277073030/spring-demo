@@ -1,64 +1,69 @@
-#cache: &global_cache
-#  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-#  paths:
-#    - node_modules/
-
 stages:
-#  - yarn install
-#  - docker-build-push
-  - deploy
+#  - maven-install
+#  - docker-build
+#  - deploy
+  - argocd
 
-#build:
-#   image: node:latest
-#   stage: build
-#
-#   before_script:
-#     - echo "start build"
-#   script:
-#     - yarn install --production --frozen-lockfile
-#   tags:
-#     - myk8s
 
-#docker-build-push:
-#  stage: docker-build-push
+#variables:
+#  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+#image: maven:3.3.9-jdk-8
 #
-#  cache:
-#    <<: *global_cache
-#    policy: pull
+#cache:
+#  paths:
+#    - .m2/repository
 #
-#  services:
-#    - docker:18.09-dind
-#  image: docker:18.09
+#maven-install:
+#  stage: maven-install
+#  script:
+#    - 'mvn install'
+#    - 'ls .m2/repository'
+#  tags:
+#    - myk8s
+#
+#docker-build:
+#  # Official docker image.
+#  image: docker:latest
 #  variables:
-#    DOCKER_DRIVER: overlay2
-#    DOCKER_HOST: tcp://docker:2375/
-#    # DOCKER_TLS_CERTDIR: ""
-#
-#    CI_REGISTRY_USER: admin
-#    CI_REGISTRY_PASSWORD: Harbor12345
-#    CI_REGISTRY: local-registry.arnoo.com
-#    CI_REGISTRY_IMAGE: local-registry.arnoo.com/devops/example-test
-#
-#
+#    CI_REGISTRY_USER: fanchao1510@sina.com
+#    CI_REGISTRY_PASSWORD: fc18650423218
+#    CI_REGISTRY: registry.cn-hangzhou.aliyuncs.com
+#    CI_REGISTRY_IMAGE: registry.cn-hangzhou.aliyuncs.com/fc277073030/spring-demo:$CI_COMMIT_REF_SLUG
+#  stage: docker-build
+#  services:
+#    - docker:dind
 #  before_script:
-#    - env
 #    - docker ps
 #    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 #  script:
-#    - docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" .
-#    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+#    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+#    - docker push "$CI_REGISTRY_IMAGE"
+#  only:
+#    - master
 #  tags:
 #    - myk8s
 
+#deploy:
+#  image: lachlanevenson/k8s-kubectl:v1.20.1
+#  services:
+#    - name: docker:latest
+#  stage: deploy
+#  script:
+#    - kubectl get pod -A
+#    - docker version
 
-deploy:
-#  variables:
-#    KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-ci
-#    KUBERNETES_NAMESPACE_OVERWRITE: ci-${CI_COMMIT_REF_SLUG}
-  image: lachlanevenson/k8s-kubectl:v1.18.14
-  stage: deploy
+#  tags:
+#    - myk8s
+
+argocd:
+  stage: argocd
+  image: alpine/git
+  variables:
+    CI_JOB_TOKEN: zYYn8MnU7r4WdCdwghpB
   script:
-    - kubectl version
-    - kubectl get pod
+    - git clone http://root:${CI_JOB_TOKEN}@192.168.3.29/devops/env-dev.git
+    - ls
+#    - kustomize build .
   tags:
     - myk8s
