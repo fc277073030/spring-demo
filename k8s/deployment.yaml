@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-demo
+  namespace: example
+  labels:
+    app: spring-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-demo
+  template:
+    metadata:
+      labels:
+        app: spring-demo
+        release: kube-prometheus-stack
+    spec:
+      containers:
+        - name: spring-demo
+          image: fc277073030/spring-demo
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "1Gi"
+            limits:
+              cpu: "800m"
+              memory: "2Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-demo
+  namespace: example
+  labels:
+    app: spring-demo
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: spring-demo
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-demo-ingress
+spec:
+  rules:
+    - host: spring-demo.fc277073030.com
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            backend:
+              service:
+                name: spring-demo
+                port:
+                  number: 8080

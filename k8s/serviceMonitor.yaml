@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: spring-demo
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack   # 注意，必须写这个标签名称
+spec:
+  jobLabel: k8s-app
+  namespaceSelector:     # 名称空间选择
+    any: true
+  selector:
+    matchLabels:    # 匹配service 的lable
+      app: spring-demo
+  endpoints:
+    - interval: 10s  # 拉取时间间隔
+      port: http
+      path: /actuator/prometheus
+      honorLabels: true    # 用于解决拉取数据标签有冲突，当设置为 true, 以拉取数据为准，否则以服务配置为准
